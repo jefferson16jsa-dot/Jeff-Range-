@@ -56,7 +56,7 @@ resistencia = st.sidebar.number_input(
     format="%.3f"
 )
 
-# Algoritmo de Cálculo de Temperatura Iterativo (Newton-Raphson de Alta Precision)
+# Algoritmo de Cálculo de Temperatura Iterativo (Newton-Raphson de Alta Precisão)
 def calcular_temperatura_rtd(R, r0, A, B, C):
     if R >= r0:
         # Equação exata de 2º Grau para T >= 0 °C
@@ -122,6 +122,7 @@ if vmin != vmax:
     else:
         cor_barra = '#2ca02c'  
 
+    # Criação do gráfico corrigido sem erros de sintaxe
     fig, ax = plt.subplots(figsize=(2, 4.5))
     ax.bar([''], [100], color='#e0e0e0', edgecolor='none', width=0.4)
     ax.bar([''], [porcentagem], color=cor_barra, edgecolor='none', width=0.4)
@@ -134,8 +135,9 @@ if vmin != vmax:
         ax.spines[spine].set_visible(False)
         
     st.markdown("### 📊 Nível do Processo")
-    col_graph1, col_graph2, col_graph3 = st.columns()
+    col_graph1, col_graph2, col_graph3 = st.columns(3)
     with col_graph2:
         st.pyplot(fig)
 else:
     st.error("Erro: O Range Máximo não pode ser idêntico ao Range Mínimo.")
+
