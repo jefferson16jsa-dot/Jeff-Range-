@@ -12,9 +12,9 @@ st.sidebar.markdown("# 🌡️ Conversor RTD Avançado")
 st.sidebar.write("Calibração de alta precisão baseada na norma **IEC 60751 / ITS-90**.")
 
 # 1. Seleção do Elemento Sensor
-tipo_rtd = st.sidebar.selectbox("1. Elemento Sensor:", ["Pt100", "Pt1000", "Pt500"])
+tipo_rtd = st.sidebar.selectbox("1. Elemento Sensor:", ["Pt100", "Pt500", "Pt1000"])
 
-# Define a resistência nominal a 0°C (R0)
+# Define a resistência nominal a 0°C (r0)
 if tipo_rtd == "Pt100":
     r0 = 100.0
 elif tipo_rtd == "Pt500":
@@ -56,25 +56,20 @@ resistencia = st.sidebar.number_input(
     format="%.3f"
 )
 
-# Algoritmo de Cálculo de Temperatura Iterativo (Newton-Raphson de Alta Precisão)
-def calcular_temperatura_rtd(R, R0, A, B, C):
-    if R >= R0:
+# Algoritmo de Cálculo de Temperatura Iterativo (Newton-Raphson de Alta Precision)
+def calcular_temperatura_rtd(R, r0, A, B, C):
+    if R >= r0:
         # Equação exata de 2º Grau para T >= 0 °C
-        # R = R0 * (1 + A*t + B*t^2) -> B*t^2 + A*t + (1 - R/R0) = 0
-        discriminante = (A ** 2) - (4 * B * (1.0 - (R / R0)))
+        discriminante = (A ** 2) - (4.0 * B * (1.0 - (R / r0)))
         if discriminante >= 0:
             return (-A + np.sqrt(discriminante)) / (2.0 * B)
         return None
     else:
         # Equação de 4º Grau para T < 0 °C (Callendar-Van Dusen Completa)
-        # R = R0 * [1 + A*t + B*t^2 + C*(t - 100)*t^3]
-        # Resolução numérica robusta por aproximações sucessivas
-        t_ajustado = (R - R0) / (R0 * A) # Estimativa linear inicial
-        for _ in range(12): # 12 iterações garantem precisão de sub-micrograus
-            # Função f(t) = R_calculado - R_real
-            f_t = R0 * (1.0 + A * t_ajustado + B * (t_ajustado ** 2) + C * (t_ajustado - 100.0) * (t_ajustado ** 3)) - R
-            # Derivada f'(t)
-            derivada = R0 * (A + 2.0 * B * t_ajustado + C * (4.0 * (t_ajustado ** 3) - 300.0 * (t_ajustado ** 2)))
+        t_ajustado = (R - r0) / (r0 * A) # Estimativa linear inicial
+        for _ in range(12): 
+            f_t = r0 * (1.0 + A * t_ajustado + B * (t_ajustado ** 2) + C * (t_ajustado - 100.0) * (t_ajustado ** 3)) - R
+            derivada = r0 * (A + 2.0 * B * t_ajustado + C * (4.0 * (t_ajustado ** 3) - 300.0 * (t_ajustado ** 2)))
             if derivada == 0:
                 break
             t_ajustado = t_ajustado - (f_t / derivada)
@@ -144,4 +139,3 @@ if vmin != vmax:
         st.pyplot(fig)
 else:
     st.error("Erro: O Range Máximo não pode ser idêntico ao Range Mínimo.")
-
